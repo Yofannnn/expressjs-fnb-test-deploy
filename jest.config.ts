@@ -1,0 +1,15 @@
+module.exports = {
+  preset: "ts-jest",
+  testEnvironment: "node",
+  testMatch: ["**/__test__/**/*.ts", "**/*.test.ts"],
+  collectCoverageFrom: ["src/**/*.ts", "!src/**/*.d.ts"],
+  coverageDirectory: "coverage",
+  coverageReporters: ["text", "lcov", "html"],
+  transform: { "^.+\\.ts$": ["ts-jest", { tsconfig: "tsconfig.test.json" }] },
+  moduleNameMapper: { "^@/(.*)$": "<rootDir>/src/$1" },
+  roots: ["<rootDir>/__test__"],
+  moduleFileExtensions: ["ts", "js", "json"],
+  clearMocks: true,
+  verbose: true,
+  injectGlobals: true,
+};
