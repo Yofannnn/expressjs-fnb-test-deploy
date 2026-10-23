@@ -72,4 +72,16 @@ async function bootstrap() {
   }
 }
 
-bootstrap();
+const instance = new App();
+
+if (!process.env.VERCEL) {
+  instance
+    .initialize()
+    .then(() => instance.listen())
+    .catch((error) => {
+      console.error("Failed to bootstrap application", error);
+      process.exit(1);
+    });
+}
+
+export default instance.app;
