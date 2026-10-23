@@ -136,12 +136,10 @@ export class AuthController {
   }
 
   private getRefreshTokenCookieOptions(): CookieOptions {
-    const isProduction = process.env.NODE_ENV === "production";
-
     return {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
       path: "/",
     };
   }
