@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { CookieOptions, Request, Response } from "express";
 import { AuthenticatedRequest } from "../types/authenticated-request.type";
 import { RegisterUseCasePort } from "@/application/ports/driving/register.use-case.port";
 import { LoginUseCasePort } from "@/application/ports/driving/login.use-case.port";
@@ -135,26 +135,27 @@ export class AuthController {
     return res.json({ message: "Password reset successfully" });
   }
 
-  private setRefreshTokenCookie(res: Response, refreshToken: string): void {
+  private getRefreshTokenCookieOptions(): CookieOptions {
     const isProduction = process.env.NODE_ENV === "production";
 
-    res.cookie(AUTH_CONSTANTS.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
+    return {
       httpOnly: true,
       secure: isProduction,
-      sameSite: "strict",
+      sameSite: isProduction ? "none" : "lax",
       path: "/",
+    };
+  }
+
+  private setRefreshTokenCookie(res: Response, refreshToken: string): void {
+    res.cookie(AUTH_CONSTANTS.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
+      ...this.getRefreshTokenCookieOptions(),
       maxAge: TimeUtil.daysToMs(this.sessionPolicy.refreshTokenLifetimeDays),
     });
   }
 
   private clearRefreshTokenCookie(res: Response): void {
     try {
-      res.clearCookie(AUTH_CONSTANTS.REFRESH_TOKEN_COOKIE_NAME, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        path: "/",
-      });
+      res.clearCookie(AUTH_CONSTANTS.REFRESH_TOKEN_COOKIE_NAME, this.getRefreshTokenCookieOptions());
     } catch (error) {
       this.logger.error({
         context: "AuthController",
